@@ -1,0 +1,352 @@
+<div class="hero-unit">
+  <h2> Help Center </h2>
+  <div class="container well">
+    <b>Status:</b> <span id="waiting-timer">00:00</span>
+  </div>
+</div>
+
+<div class="container well rtccWebRTCControls" style="display:none">
+  <div id="video-container" style="width:322px; height:182px; background:#ffffff; border: 1px solid #AAAAAA;">
+    <%= image_tag("SightCall_Logo.png", size: "320x180", style: "position:absolute") %>
+  </div>
+</div>
+
+<div id="chatmessages" class="panel panel-default">
+  (chat messages will appear here) <br>
+  <br>
+  <br>
+  <br>
+</div>
+<form id="chatform" >
+  <div class="input-group">
+    <input id="chattext" type="text" class="form-control" placeholder="type here" />
+    <span class="input-group-btn"> <button type="submit" class="btn btn-default"> Send </button> </span>
+  </div>
+</form>
+
+<div class="col-sm-2 pull-right">
+  <br>
+  <button class="btn btn-large btn-primary" onclick="CloseMe();">Close Window</button>
+</div>
+
+<%= audio_tag("Click03.mp3", id: 'clicksound', autoplay: true, controls: false) %>
+
+<script>
+ var rtccAppId = "<%= RTCC_APP_ID %>";
+ var rtcc = null;
+ var rtccCall = null;
+ var MPI = null;
+ var counterManager = null
+ var originId = null;
+
+ //
+ // Functions for managing our little chat service
+ //
+
+ var messages = [ "<br>", "<br>", "<br>", "<br>" ];
+
+ function appendSent(msg) {
+   x = messages.shift()
+   messages.push('<em>' + msg + '<em> <br>');
+   $("#chatmessages").html(messages);
+ }
+
+ function appendReceived(msg) {
+   x = messages.shift()
+   messages.push(msg + '<br>');
+   $("#clicksound")[0].play();
+   $("#chatmessages").html(messages);
+ }
+
+  $("#chatform").submit(function() {
+   msg = $("#chattext").val();
+   $("#chattext").val("");
+   if ((originId != null) && (rtcc != null)) {
+     appendSent(msg);
+     rtcc.sendMessage(0, originId, msg);
+   }
+   else {
+     appendSent("not ready to chat");
+   }
+   return false;
+ })
+
+
+ //
+ // get token
+ //
+
+ function getToken(url, uid, success, failure) {
+   $.ajax({
+     type: "POST",
+     url: url,
+     data: { uid: uid },
+     cache: false,
+     dataType: "JSON"
+   }).success(function(data) {
+     console.log(["RtccToken Success", data]);
+     success(data);
+   }).error(function(e) {
+     console.log(["RtccToken error", e]);
+     failure(e);
+   });
+ }
+
+//
+// getToken, set it and authenticate (again)
+//
+
+ function setTokenAndAuthenticate(url, uid) {
+   getToken(
+     url, uid,
+     function(data) {
+       var token = data.token;
+       rtcc.setToken(token);
+       rtcc.authenticate(1);
+     }, function(e) {
+       // the default prints it already
+     });
+ }
+
+ function updateProgress(str) {
+   $.ajax({
+     type: "POST",
+     url: "/visitor/update",
+     data: { progress: str },
+     cache: false,
+     dataType: "JSON"
+   }).success(function(data) {
+     console.log(["UpdateProgress Success", str, data]);
+   }).error(function(e) {
+     console.log(["UpdateProgress error", e, str]);
+   });
+ }
+
+ function initializeRtcc(weepAppId, token, displayName) {
+   var options = {
+     debugLevel: 3,
+     displayName: displayName,
+     container: 'video-container'
+     
+   };
+   rtcc = new Rtcc(rtccAppId, token, 'internal', options);
+
+   updateProgress("initializing");
+
+   // Get the Connection Handler callback when the JavaScript is connected to WeemoDriver
+   rtcc.onConnectionHandler = function(message, code) {
+
+     console.log(['onConnectionHandler', message, code]);
+     switch(message) {
+       case 'connectedRtccDriver':
+         $(".rtccConnectionStatus").attr("status", "connected");
+         updateProgress("connected Driver");
+         break; 
+
+       case 'connectedWebRTC':
+         $(".rtccConnectionStatus").attr("status", "connected");
+         $(".rtccWebRTCControls").show();
+         updateProgress("connected WebRTC");
+         break; 
+
+       case 'connectedCloud':
+         $(".rtccConnectionStatus").attr("status", "connectedCloud");
+         updateProgress("connected Cloud");
+         break;
+
+       case 'disconnectedRtccDriver':
+         $(".rtccConnectionStatus").attr("status", "offline");
+         $(".rtccConnectionActive").attr("disabled", "disabled");
+         setTokenAndAuthenticate("/visitor/callback", "<%= @randomUid %>");
+         break;
+
+       case 'disconnectedWebRTC':
+         $(".rtccConnectionStatus").attr("status", "offline");
+         $(".rtccConnectionActive").attr("disabled", "disabled");
+         setTokenAndAuthenticate("/visitor/callback", "<%= @randomUid %>");
+         break;
+
+       case 'sipOk':
+         $(".rtccConnectionStatus").attr("status", "sipOk");
+         $(".rtccConnectionActive").removeAttr("disabled");
+         updateProgress("ready");
+         break;
+
+       case 'sipNok':
+         $(".rtccConnectionStatus").attr("status", "offline");
+         $(".rtccConnectionActive").attr("disabled", "disabled");
+         updateProgress("not ready");
+         break;
+
+       case 'dropped':
+         $(".rtccConnectionStatus").attr("status", "alert");
+         $(".rtccConnectionActive").attr("disabled", "disabled");
+         updateProgress("dropped");
+         break;
+
+       case 'loggedasotheruser':
+         setTokenAndAuthenticate("/visitor/callback", "<%= @randomUid %>");
+         break;
+
+       case 'presenceOkNewUser':
+         rtcc.setMyPresence(1);
+         break;
+
+       case 'presenceOkAlreadyRegistered':
+         rtcc.setMyPresence(1);
+         break;
+                            
+     }
+   }
+     
+   rtcc.onCallHandler = function(call, args) {
+
+     console.log(['onCallHandler', call, args]);
+     rtccCall = call;
+
+     // Handle incoming call
+     if (args.type == 'webRTCcall' && args.status == 'incoming') {
+       var ans = confirm("Accept call from '" + call.dn + "'?");
+       if (ans == true) {
+         rtccCall.accept();
+       }
+       else {
+         rtccCall.hangup();
+       }
+     }
+
+     // Handle refused call
+     if (args.status == 'terminated' && args.reason == 'rejected') {
+       alert("Call rejected");
+     }
+
+     // Handle call to UID not logged-in
+     if (args.status == 'terminated' && args.reason == 'not found') {
+       alert("User not logged in");
+     }
+
+     // Manage button highlighting
+     if ((args.status == "active")) {
+       // look for class rtccCallActive and mark enabled
+       $(".rtccCallActive").removeAttr("disabled");
+       updateProgress("call active");
+     }
+
+     if ((args.status == "terminated")) {
+       // look for class rtccCallActive and mark disabled
+       $(".rtccCallActive").attr("disabled", "disabled");
+       updateProgress("call terminated");
+     }
+
+   }
+
+   rtcc.onConfCallHandler = function(action, obj) {
+
+     console.log(["rtccOnConfCallHandler", action, obj]);
+
+     if (action == 'attendeeInvited') {
+       MPI = obj;       // the object is the meeting point
+       
+       counterManager.stop(" Connected.");
+
+       var ans = confirm("Accept call from '" + MPI.hostDisplayName + "'?");
+       if (ans == true) {
+         updateProgress("invitation accepted");
+         MPI.accept();
+       }
+       else {
+         updateProgress("invitation denied");
+         MPI.deny();
+       }
+     }
+
+   }
+
+   rtcc.onGetHandler = function(name, value) {
+     console.log(['onGetHandler', name, value]);
+   }
+
+   rtcc.onMessageReceived = function(msgid, oid, msg) {
+     if (originId == null) {
+       counterManager.stop(" Connected.");
+       originId = oid; // set global
+     }
+     appendReceived(msg);
+   }
+
+   rtcc.onRtccDriverNotStarted = function(downloadUrl) {
+     var answer = confirm('Click OK to download and install the Rtcc client.');
+     if (answer == true) {
+       window.location = downloadUrl;
+     }
+   };
+
+   rtcc.initialize();
+ }
+
+ function CloseMe() {
+   window.close(); // for popup window
+   if (parent != null && typeof(parent) != 'undefined') {
+     parent.jQuery.colorbox.close();  // for iframe colorbox
+   }
+ }
+
+
+ ////////////////////////////////////////////////////////////////
+ //
+ // Kick-off this application on page load
+ //
+
+ function documentReady() {
+
+   counterManager = new CounterManager("#waiting-timer", " Connecting to Agent ...");
+
+   getToken(
+     "/visitor/callback",
+     "<%= @randomUid %>",
+     function(data) {
+       var token = data.token;
+       initializeRtcc(rtccAppId, token, "Visitor-<%= @randomUid %>");
+     }, function(e) {
+       // the default prints it already
+     });
+   
+   $(window).on('beforeunload', function() {
+     updateProgress("departed");
+     return "Leaving SightTicket page"
+   });
+
+   // This is too late to POST
+   $(window).on('unload', function() {
+     updateProgress("unloaded");
+     return "Leaving SightTicket page"
+   });
+
+   console.log(["WINDOW", window]);
+
+   // Confusion: Receive a message from our parent frame
+   $(window).on('message'), function(e) {
+     console.log(["window.on(message)", e]);
+     updateProgress("iframe listener exit");
+   }
+
+   // Failed: this doesn't work either
+   window.addEventListener('onmessage', function(e) {
+     console.log(["onmessage listener", "thing"]);
+     updateProgress("iframe listener exit");
+   }, false);
+
+   // Success: this seems to work in Chrome
+   window.addEventListener('message', function(e) {
+     console.log(["message listener", "thing"]);
+     updateProgress("iframe listener exit");
+   }, false);
+ }
+
+ $(document).ready(documentReady);
+
+</script>
+
+
+
+

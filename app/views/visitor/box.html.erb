@@ -1,0 +1,25 @@
+<html>
+
+  <a class="popup" href="/visitor/waitbox?skill=mortgage">  <img src='<%= asset_path("wellsfargo.png") %>'> </a>
+
+  <script>
+   $(document).ready(function() {
+     $('a.popup').colorbox({
+       iframe: true,
+       scrollbar: true,
+       innerWidth: "75%",
+       innerHeight: "75%",
+       opacity: 0.80,
+
+       // On cleanup, post a message to our iframe
+       onCleanup: function(e) {
+         var i = $("#cboxLoadedContent iframe")[0];
+         var w = i.contentWindow;
+         w.postMessage("cleanup", "*");
+       }
+     });
+
+   });
+  </script>
+
+</html>

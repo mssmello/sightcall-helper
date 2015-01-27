@@ -1,0 +1,7 @@
+development:
+  username: ticket_development
+  database: ticket_development
+  adapter: postgresql
+  encoding: unicode
+  pool: 5
+

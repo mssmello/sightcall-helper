@@ -1,0 +1,19 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  created_at: 2014-12-02 09:37:56
+  updated_at: 2014-12-02 09:37:56
+  key: MyString
+  uid: MyString
+  displayname: MyString
+  skill: MyString
+  served: false
+
+two:
+  created_at: 2014-12-02 09:37:56
+  updated_at: 2014-12-02 09:37:56
+  key: MyString
+  uid: MyString
+  displayname: MyString
+  skill: MyString
+  served: false

@@ -1,0 +1,27 @@
+<html>
+
+  <script>
+   var chatWin = null;
+   function findChatWindow() {
+
+     function openChatWindow() {
+       chatWin = window.open("/visitor/wait?skill=wellsfargo", 'VisitorWait', 'left=20,top=20,width=500,height=600,status=no,toolbar=no,menubar=no,location=0')
+     }
+       
+     if (chatWin == null) {
+       openChatWindow();
+     }
+     else {
+       if (chatWin.closed == true) {
+         openChatWindow();
+       }
+       else {
+         chatWin.focus();
+       }
+     }
+   }
+  </script>
+
+  <a href="#" onclick="findChatWindow(); return false;">  <img src='<%= asset_path("wellsfargo.png") %>'> </a>
+
+</html>

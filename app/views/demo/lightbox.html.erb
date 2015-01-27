@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SightCall Colorbox Demo</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css" />
+    <%= javascript_include_tag "application" %>
+    <%= stylesheet_link_tag    "application", media: "all" %>
+    <%= csrf_meta_tags %>
+
+    <style>
+     body { padding-top: 10px; }
+     footer { margin-top: 10px; }
+    </style>
+
+
+  </head>
+  <body>
+
+    <!-- sample representation of a web site -->
+    <img src="/TTcomMyBankV3.png" usemap="#clickmap"/>
+
+    <!-- intercept a click on the Video Assistance area -->
+    <map name="clickmap">
+      <area class="popup" shape="rect" coords="875,545,1086,731"  href="/visitor/wait?skill=mortgage" alt="Get Assistance">
+    </map>
+
+    <script>
+     $(document).ready(function() {
+       $('area.popup').colorbox({
+         iframe: true,
+         scrollbar: true,
+         innerWidth: "75%",
+         innerHeight: "75%",
+         opacity: 0.80,
+
+         // On cleanup, post a message to our iframe
+         onCleanup: function(e) {
+           var i = $("#cboxLoadedContent iframe")[0];
+           var w = i.contentWindow;
+           w.postMessage("cleanup", "*");
+         }
+       });
+
+     });
+    </script>
+
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="//download.rtccloud.net/js/webappid/<%= RTCC_APP_ID %>" ></script>
+
+  </body>
+</html>

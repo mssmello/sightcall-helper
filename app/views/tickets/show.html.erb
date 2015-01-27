@@ -1,0 +1,85 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Created at:</strong>
+  <%= local_time(@ticket.created_at) %>
+</p>
+
+<p>
+  <strong>Updated at:</strong>
+  <%= local_time(@ticket.updated_at) %>
+</p>
+
+<p>
+  <strong>Owner:</strong>
+  <%= @ticket.user && @ticket.user.name %>
+</p>
+
+<p>
+  <strong>Key:</strong>
+  <%= @ticket.key %>
+</p>
+
+<p>
+  <strong>Uid:</strong>
+  <%= @ticket.uid %>
+</p>
+
+<p>
+  <strong>Displayname:</strong>
+  <%= @ticket.displayname %>
+</p>
+
+<p>
+  <strong>Skill:</strong>
+  <%= @ticket.skill %>
+</p>
+
+<p>
+  <strong>Served:</strong>
+  <%= @ticket.served %>
+</p>
+
+<p>
+  <strong>UserAgent:</strong>
+  <%= @ticket.useragent %>
+</p>
+
+<p>
+  <strong>Progress:</strong>
+  <%= @ticket.progress %>
+</p>
+
+<div class="container well">
+  <h4>CloudRecorder Callbacks</h4>
+
+  <p>
+    <strong>Title:</strong>
+    <%= @ticket.cr_title %>
+  </p>
+
+  <p>
+    <strong>Status:</strong>
+    <%= @ticket.cr_status %>
+  </p>
+
+
+  <p>
+    <strong>Webm_s3url:</strong>
+    <a href="<%= @ticket.cr_webm_s3url %>" target=_new> <%= @ticket.cr_webm_s3url %> </a>
+  </p>
+
+  <p>
+    <strong>Mp4_s3url:</strong>
+    <a href="<%= @ticket.cr_mp4_s3url %>" target=_new> <%= @ticket.cr_mp4_s3url %> </a>
+  </p>
+
+  <p>
+    <strong>Vb_fileurl:</strong>
+    <a href="<%= @ticket.cr_vb_fileurl %>" target=_new> <%= @ticket.cr_vb_fileurl %> </a>
+  </p>
+
+</div>
+
+
+<%= link_to 'Edit', edit_ticket_path(@ticket) %>

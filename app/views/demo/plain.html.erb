@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SightCall Popup Demo</title>
+
+    <script>
+     var chatWin = null;
+     function findChatWindow() {
+
+       function openChatWindow() {
+         chatWin = window.open("/visitor/wait?skill=loans", 'VisitorWait', 'left=20,top=20,width=500,height=600,status=no,toolbar=no,menubar=no,location=0')
+       }
+       
+       if (chatWin == null) {
+         openChatWindow();
+       }
+       else {
+         if (chatWin.closed == true) {
+           openChatWindow();
+         }
+         else {
+           chatWin.focus();
+         }
+       }
+     }
+    </script>
+  </head>
+
+  <body>
+    <!-- sample representation of a web site -->
+    <img src="/TTcomMyBankV3.png" usemap="#clickmap"/>
+
+    <!-- intercept a click on the Video Assistance area -->
+    <map name="clickmap">
+      <area shape="rect" coords="875,545,1086,731" onClick="findChatWindow(); return false;" alt="Get Assistance">
+    </map>
+  </body>
+
+</html>

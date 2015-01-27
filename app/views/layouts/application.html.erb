@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SightCall HelpCenter</title>
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css" />
+  <% if @loadrtcc %>
+    <script src="//download.rtccloud.net/js/webappid/<%= RTCC_APP_ID %>" ></script>
+  <% end %>
+  <%= stylesheet_link_tag    "application", media: "all" %>
+  <%= javascript_include_tag "application" %>
+  <%= csrf_meta_tags %>
+</head>
+<body>
+
+  <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+
+        <a class="navbar-brand" href="/"> SightCall Helper
+          <% if @loadrtcc %>
+            <div class="rtccConnectionStatus" status=offline> </div> 
+          <% end %>
+        </a>
+      </div>
+
+      <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+
+          <% if controller.controller_name != 'auth' %>
+
+            <% if controller.controller_name == 'tickets' %>
+              <% if controller.action_name == 'index' %>
+                <li class="active"><a href="/tickets">Open</a></li>
+                <li class=""><a href="/tickets/closed">Closed</a></li>
+              <% elsif controller.action_name == 'closed' %>
+                <li class=""><a href="/tickets">Open</a></li>
+                <li class="active"><a href="/tickets/closed">Closed</a></li>
+              <% else %>
+                <li class=""><a href="/tickets">Open</a></li>
+                <li class=""><a href="/tickets/closed">Closed</a></li>                
+              <% end %>
+            <% else %>
+              <li class=""><a href="/tickets">Open</a></li>
+              <li class=""><a href="/tickets/closed">Closed</a></li>                
+            <% end %>
+
+          <% end %>
+            
+        </ul>
+
+
+        <p class="navbar-text pull-right">
+
+          <% if user_signed_in? %>
+            Logged in as <strong><%= current_user.name %></strong>.
+            <%= link_to "Logout", '/auth/logout', :class => 'navbar-link'  %>
+          <% else %>
+            
+          <% end %>
+        </p>
+
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <% if notice %>
+      <p class="alert alert-success"><%= notice %></p>
+    <% end %>
+    <% if alert %>
+      <p class="alert alert-danger"><%= alert %></p>
+    <% end %>
+
+    <%= yield %>
+  </div>
+
+  <footer>
+    <div class="container">
+      SightCall 2015
+    </div>
+  </footer>
+
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+</body>
+</html>
