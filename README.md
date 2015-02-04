@@ -208,7 +208,7 @@ website with just a few lines of code.
 
 ### Visitor Plain Style
 
-The Plain demonstration pager style responds to a click in the "Video
+The Plain demonstration page style responds to a click in the "Video
 Agent" area of the image.
 
 <img src="images/visitor_demoplain.png" width="200px" />
