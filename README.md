@@ -16,7 +16,7 @@ A Visitor enters the help queue by clicking on a "Video Assistance"
 button in a web site.  The Visitor's help window has a text-chat area 
 and a video window that can show the video feed of the Agent.
 
-<img src="images/visitor_wait.png" width="200px" />
+<img src="images/Helper-lady.png" width="200px" />
 
 The Agent console displays a list of tickets waiting to be
 serviced.  An Agent may select a specific visitor to help, or may
