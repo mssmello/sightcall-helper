@@ -99,6 +99,7 @@ Note the URL of the project you just created.  (E.g. https://your-app-1234.herok
 - Set the following Heroku environment variables **exactly** as shown below.
 
 ```sh
+    % heroku config:set RTCC_AUTH_URL=https://auth.rtccloud.net/auth/
     % heroku config:set RTCC_CACERT=certs/authCA.crt
     % heroku config:set RTCC_CLIENTCERT=certs/publicCert.pem
     % heroku config:set RTCC_CLIENTCERT_KEY=certs/privateKey.pem
