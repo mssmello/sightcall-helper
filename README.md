@@ -42,18 +42,23 @@ suffice.) Read on.
 You can run your own instance of SightCall Helper on Heroku in
 just a few minutes.
 
-- Clone this repository so you can customize it.
+- Clone this repository so you can customize it.  Move into the new directory.
+
+```sh
+    % git clone git@github.com:sightcall/Helper.git
+    % cd Helper
+```
+
 - If you have not already, you must request an API KEY and credentials from SightCall.
   Get it here: [http://www.sightcall.com/developers/](http://www.sightcall.com/developers/).
 
-- Put the files `client.p12` and `authCA.crt` in the `/certs` directory.  Check them in.
+- Put the files `client.p12` and `authCA.crt` in the `/certs` directory.  Commit them in to the local copy of the repository.
 
 ```sh
     % cd certs
     % git add client.p12
     % git add authCA.crt
     % git commit -m "add the certs"
-    % git push
 ```
 
 - Unpack your `client.p12` file into its two components.
@@ -69,9 +74,14 @@ just a few minutes.
     % git add privateKey.pem
     % git add publicCert.pem
     % git commit -m "add the unpacked certs"
-    % git push
 ```
 
+
+- Move back up to the home directory of Helper to be ready for the `heroku` commands to follow.
+
+```sh
+    % cd ..
+```
 
 - Create a new Heroku project for this demo.
 
