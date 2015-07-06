@@ -1,12 +1,13 @@
 {
     "name": "SightCall Helper",
-    "description": "Project showing Video WebRTC HELP-DESK application built on the SightCall platform.  Transparent plugin support for non-WebRTC browsers.  Ruby+Rails+PostgreSQL",
+    "description": "Video/WebRTC Help-Desk built using SightCall platform.  Transparent plugin support for non-WebRTC browsers.  Ruby+Rails+PostgreSQL",
     "keywords": [
         "video",
         "HTML5",
         "WebRTC",
         "Ruby",
         "Rails",
+        "PostgreSQL",
         "realtime",
         "SuperStar"
     ],
