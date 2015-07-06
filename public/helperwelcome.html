@@ -54,17 +54,32 @@
 
     <p>
       Website Visitors requiring assistance click on a "Video
-      Assistance" button that you embed in your website.  This will
-      launch the "Visitor" page, with an optional query parameter
-      suggesting a skill that a qualified Agent should provide.  An
-      example is shown below.</p>
-
-    
-    <p>
-      <a href="/visitor/wait?skill=loans"> <span id="visitorURL">/visitor/wait?skill=loans</span></a>
+      Assistance" button that you embed in your website.
     </p>
 
     <p>
+      <a href="/demo/plain"> <span id="plainURL"></span>/demo/plain</a>
+    </p>
+
+    <p>
+      You can also set up to launch the Visitor Assistance in a lightbox on top
+      of your page.  An example appears below.
+    </p>
+
+    <p>
+      <a href="/demo/lightbox"> <span id="lightboxURL"></span>/demo/lightbox</a>
+    </p>
+
+    <p>
+      Or you can embed a link to the "Visitor" page, with an optional query parameter
+      suggesting a skill that a qualified Agent should provide.  An
+      example is shown below.
+    </p>
+
+    <p>
+      <a href="/visitor/wait?skill=loans"> <span id="visitorURL"></span>/visitor/wait?skill=loans</a>
+    </p>
+
       
   </div>
 
@@ -81,6 +96,8 @@
 
      $('#agentURL').html(window.location.origin);
      $('#visitorURL').html(window.location.origin + '/visitor/wait?skill=loans');
+     $('#plainURL').html(window.location.origin + '/demo/plain');
+     $('#lightboxURL').html(window.location.origin + '/demo/lightbox');
 
    });
   </script>
