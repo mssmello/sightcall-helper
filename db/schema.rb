@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150123185530) do
+ActiveRecord::Schema.define(version: 20150706210918) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -36,6 +36,7 @@ ActiveRecord::Schema.define(version: 20150123185530) do
     t.string   "cr_mp4_s3url"
     t.string   "cr_vb_state"
     t.string   "cr_vb_fileurl"
+    t.string   "ipaddress"
   end
 
   add_index "tickets", ["user_id"], name: "index_tickets_on_user_id", using: :btree
