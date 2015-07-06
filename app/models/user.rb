@@ -15,7 +15,7 @@ class User < ActiveRecord::Base
   end
 
   def rtcc_domain
-    "yourdomain.com"
+    RTCC_DOMAIN_IDENTIFIER
   end
 
 
