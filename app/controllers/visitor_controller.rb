@@ -1,6 +1,6 @@
-require 'rtcc_auth'
+require 'rtcc_client'
 
-VISITOR_DOMAIN = "yourdomain.com"
+VISITOR_DOMAIN = "communi.com"
 VISITOR_PROFILE = "standard"
 
 class VisitorController < ApplicationController
@@ -8,7 +8,7 @@ class VisitorController < ApplicationController
   skip_before_filter :authorize
 
   def initialize
-    @client = RTCCAuth.new(RTCC_AUTH_URL, RTCC_CACERT, RTCC_CLIENTCERT, RTCC_CLIENTCERT_KEY, RTCC_CERTPASSWORD, RTCC_CLIENT_ID, RTCC_CLIENT_SECRET)
+    @client = RTCCClient.new(RTCC_CLIENT_ID, RTCC_CLIENT_SECRET)
     super
   end
 
@@ -19,7 +19,7 @@ class VisitorController < ApplicationController
 
   def callback
     puts "VisitorParams:", params
-    obj = @client.auth(params['uid'], VISITOR_DOMAIN, VISITOR_PROFILE)
+    obj = @client.usertoken(params['uid'], VISITOR_DOMAIN, VISITOR_PROFILE)
     logger.debug "Visitor#callback #{obj}"
     render :json => obj
   end
@@ -37,6 +37,7 @@ class VisitorController < ApplicationController
     @ticket = Ticket.new
     @ticket.uid = @randomUid
     @ticket.useragent = request.env['HTTP_USER_AGENT']
+    @ticket.ipaddress = request.remote_ip
     @ticket.progress = "created"
     @ticket.served = false
     if params[:skill]
