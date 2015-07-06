@@ -1,6 +1,9 @@
 SightCall Helper
 ================================================================
 
+<p><a href="https://heroku.com/deploy?template=https://github.com/sightcall/Helper"><img src="https://www.herokucdn.com/deploy/button.png" alt="Deploy on Heroku"></a></p>
+
+
 SightCall **Helper** is a demonstration web application showcasing
 Real-Time Communication for a small online Customer Service center.  It
 showcases "Live Text Chat" with an invitation to "Video Chat."
@@ -9,8 +12,10 @@ Helper showcases the following features of the SightCall platform.
 - Text Chat
 - Video Teleconference
 - Recording (optional)
+- Multi-browser support Chrome (webrtc), Safari, Internet Explorer, Firefox (plugin)
 
-### Overview
+
+## Overview
 
 A Visitor enters the help queue by clicking on a "Video Assistance"
 button in a web site.  The Visitor's help window has a text-chat area 
@@ -42,54 +47,35 @@ suffice.) Read on.
 You can run your own instance of SightCall Helper on Heroku in
 just a few minutes.
 
-- Clone this repository so you can customize it.  Move into the new directory.
-
-```sh
-    % git clone git@github.com:sightcall/Helper.git
-    % cd Helper
-```
-
-- If you have not already, you must request an API KEY and credentials from SightCall.
+- If you have not already, you should request an API KEY and credentials from SightCall.
   Get it here: [http://www.sightcall.com/developers/](http://www.sightcall.com/developers/).
 
-- Put the files `client.p12` and `authCA.crt` in the `/certs` directory.  Commit them in to the local copy of the repository.
+Once you have registered, you will need these four pieces of information.
 
-```sh
-    % cd certs
-    % git add client.p12
-    % git add authCA.crt
-    % git commit -m "add the certs"
-```
-
-- Unpack your `client.p12` file into its two components.
-
-```sh
-    % openssl pkcs12 -in client.p12 -nocerts -out privateKey.pem
-    % openssl pkcs12 -in client.p12 -clcerts -nokeys -out publicCert.pem
-```
-
-- Check these two files into the `/certs` directory as well.
-
-```sh
-    % git add privateKey.pem
-    % git add publicCert.pem
-    % git commit -m "add the unpacked certs"
-```
+- your RTCC_APP_ID
+- your RTCC_CLIENT_ID  (this identifies your API KEY)
+- your RTCC_CLIENT_SECRET (this is the secret part)
+- your RTCC_DOMAIN_IDENTIFIER (example: "acme.com")
 
 
-- Move back up to the home directory of Helper to be ready for the `heroku` commands to follow.
+#### Use the Heroku Button
 
-```sh
-    % cd ..
-```
+The easiest way to try out Communicator is to press the purple "Heroku
+Button" above.  This will clone this repository into your Heroku
+account and launch an instance.  Put the RTCC credentials you gathered
+above into the Environment Variable slots, and you are off and
+running!
 
+#### Or clone this repository and then push to Heroku
+
+- Clone this repository so you can customize it.
 - Create a new Heroku project for this demo.
 
 ```sh
     % heroku create
 ```
 
-Note the URL of the project you just created.  (E.g. https://your-app-1234.herokuapp.com)
+Note the URL of the project you just created.  (E.g. https://adjective-noun-1234.herokuapp.com)
 
 - Push the code to Heroku
 
@@ -97,7 +83,7 @@ Note the URL of the project you just created.  (E.g. https://your-app-1234.herok
     % git push heroku master
 ```
 
-- Run the `bootstrap` task (in file lib/tasks/bootstrap.rake).  This
+- Run the `bootstrap` task (in file lib/rake/bootstrap.rb).  This
   creates the database and the default users.  If you would like to
   customize the default users, you can edit the task before you invoke
   it.
@@ -106,22 +92,13 @@ Note the URL of the project you just created.  (E.g. https://your-app-1234.herok
     % heroku run bundle exec rake bootstrap
 ```
 
-- Set the following Heroku environment variables **exactly** as shown below.
-
-```sh
-    % heroku config:set RTCC_AUTH_URL=https://auth.rtccloud.net/auth/
-    % heroku config:set RTCC_CACERT=certs/authCA.crt
-    % heroku config:set RTCC_CLIENTCERT=certs/publicCert.pem
-    % heroku config:set RTCC_CLIENTCERT_KEY=certs/privateKey.pem
-```
-
 - Set the following Heroku environment variables as appropriate for your SightCall account.
 
 ```sh
     % heroku config:set RTCC_APP_ID=ab01cd34ef56
-    % heroku config:set RTCC_CERTPASSWORD=abcdefgh
     % heroku config:set RTCC_CLIENT_ID=7a7a7a7a7a8b8b8b8b8b9c9c9c9c9c
     % heroku config:set RTCC_CLIENT_SECRET=19ab19ab19ab19ab28cd28cd28cd28
+    % heroku config:set RTCC_DOMAIN_IDENTIFIER=acme_video.com
 ```
 
 Visit the application at your Heroku URL and log-in as one of the
@@ -135,6 +112,32 @@ pre-defined Agents.
 On a different computer, have someone else visit the demo page at
 https://your-app-1234.herokuapp.com/demo/plain and ask for **Video
 Assistance** by clicking the picture of the Video Agent.
+
+
+#### Or, Run the Rails project locally
+
+Of course, you can run this Rails project on your local machine.  Edit
+the file `config/environment.rb` to set the RTCC environment variables
+directly.  The general procedure would be this.
+
+```sh
+    % git clone git@github.com:sightcall/Communicator.git
+    % cd Communicator
+    % bundle install       (install the gems)
+    % bin/rake bootstrap   (migrate the DB and make default users)
+    % bin/rails s          (run the server)
+```
+
+Then visit it at [http://localhost:3000](http://localhost.3000).
+
+And if you want to develop locally, but debug on the public internet,
+I can recommend [ngrok](http://ngrok.com).
+
+```sh
+    % ngrok http 3000
+```
+
+This will expose your local webserver to an HTTPS port on the public internet.
 
 
 ## Add the Recording Feature
