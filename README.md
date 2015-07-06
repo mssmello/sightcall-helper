@@ -60,7 +60,7 @@ Once you have registered, you will need these four pieces of information.
 
 #### Use the Heroku Button
 
-The easiest way to try out Communicator is to press the purple "Heroku
+The easiest way to try out Helper is to press the purple "Heroku
 Button" above.  This will clone this repository into your Heroku
 account and launch an instance.  Put the RTCC credentials you gathered
 above into the Environment Variable slots, and you are off and
@@ -121,8 +121,8 @@ the file `config/environment.rb` to set the RTCC environment variables
 directly.  The general procedure would be this.
 
 ```sh
-    % git clone git@github.com:sightcall/Communicator.git
-    % cd Communicator
+    % git clone git@github.com:sightcall/Helper.git
+    % cd Helper
     % bundle install       (install the gems)
     % bin/rake bootstrap   (migrate the DB and make default users)
     % bin/rails s          (run the server)
