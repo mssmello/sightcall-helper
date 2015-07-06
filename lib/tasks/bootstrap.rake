@@ -1,7 +1,7 @@
-# Bootstrap the project
+desc "Build the default users and database"
 
-desc "Add the default users"
 task :bootstrap => :environment do
+  Rake::Task["db:migrate"].invoke
   User.new(:name => "agent1", :password => "a1password").save
   User.new(:name => "agent2", :password => "a2password").save
   User.new(:name => "agent3", :password => "a3password").save
