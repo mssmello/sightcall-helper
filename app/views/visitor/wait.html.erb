@@ -5,7 +5,7 @@
   </div>
 </div>
 
-<div class="container well rtccWebRTCControls" style="display:none">
+<div class="container well rtccWebRTCControls" style="">
   <div id="video-container" style="width:322px; height:182px; background:#ffffff; border: 1px solid #AAAAAA;">
     <%= image_tag("SightCall_Logo.png", size: "320x180", style: "position:absolute") %>
   </div>
@@ -99,8 +99,8 @@
  function setTokenAndAuthenticate(url, uid) {
    getToken(
      url, uid,
-     function(data) {
-       var token = data.token;
+     function(resp) {
+       var token = resp.data;
        rtcc.setToken(token);
        rtcc.authenticate(1);
      }, function(e) {
@@ -122,6 +122,86 @@
    });
  }
 
+ ////////////////////////////////////////////////////////////////
+ //
+ // This function is called at the 'call.create' event.  It serves
+ // two purposes: to respond to the 'call.create' event, and to attach
+ // the per-call handlers for the events of the call.
+ //
+
+ function defineCallListeners(call) {
+   rtccCall = call; // set global var
+
+   // Print all call-events for education purposes
+   call.onAll(function() {
+     if (window.console) {
+       console.log('Call: event "' + this.eventName + '" with arguments: ' + JSON.stringify(arguments));
+     }
+   });
+
+   // At the 'call.create' event, determine whether it is incoming or outgoing
+   // and perform the appropriate logic.
+   if (call.getDirection() == "incoming") {
+     if (rtcc.getConnectionMode() == Rtcc.connectionModes.WEBRTC || rtcc.getConnectionMode() == Rtcc.connectionModes.PLUGIN) {
+       var ans = confirm("Accept call from '" + call.dn + "'?");
+       if (ans == true) {
+         rtccCall.accept();
+       }
+       else {
+         rtccCall.hangup();
+       }
+     }
+   }
+
+   // Install the Chrome screenshare extension if requested
+   call.on('chrome.screenshare.missing', function(url) {
+     if (window.location.protocol == "http:") {
+       alert("Chrome screenshare requires an HTTPS connection");
+     }
+     else {
+       answer = confirm("Click OK to download and install the Chrome Screenshare Extension");
+       if (answer == true) {
+         window.open(url);
+       }
+     }
+   });
+
+   call.on('terminate', function(reason) {
+
+     // look for class rtccCallActive and mark disabled
+     $(".rtccCallActive").attr("disabled", "disabled");
+       updateProgress("call terminated");
+
+     if (reason == 'not allowed') {
+       alert("Call not allowed");
+     }
+
+     if (reason == 'rejected') {
+       alert("Call rejected");
+     }
+
+     if (reason == 'not found') {
+       alert("User not logged in");
+     }
+
+     if (reason == 'busy') {
+       alert("User is busy");
+     }
+   });
+
+   call.on('active', function() {
+     // look for class rtccCallActive and mark enabled
+     $(".rtccCallActive").removeAttr("disabled");
+     updateProgress("call active");
+   });
+   
+ }
+ 
+ ////////////////////////////////////////////////////////////////
+ //
+ // Initialize Real-Time Communication
+ //
+
  function initializeRtcc(weepAppId, token, displayName) {
    var options = {
      debugLevel: 3,
@@ -133,153 +213,114 @@
 
    updateProgress("initializing");
 
-   // Get the Connection Handler callback when the JavaScript is connected to WeemoDriver
-   rtcc.onConnectionHandler = function(message, code) {
-
-     console.log(['onConnectionHandler', message, code]);
-     switch(message) {
-       case 'connectedRtccDriver':
-         $(".rtccConnectionStatus").attr("status", "connected");
-         updateProgress("connected Driver");
-         break; 
-
-       case 'connectedWebRTC':
-         $(".rtccConnectionStatus").attr("status", "connected");
-         $(".rtccWebRTCControls").show();
-         updateProgress("connected WebRTC");
-         break; 
-
-       case 'connectedCloud':
-         $(".rtccConnectionStatus").attr("status", "connectedCloud");
-         updateProgress("connected Cloud");
-         break;
-
-       case 'disconnectedRtccDriver':
-         $(".rtccConnectionStatus").attr("status", "offline");
-         $(".rtccConnectionActive").attr("disabled", "disabled");
-         setTokenAndAuthenticate("/visitor/callback", "<%= @randomUid %>");
-         break;
-
-       case 'disconnectedWebRTC':
-         $(".rtccConnectionStatus").attr("status", "offline");
-         $(".rtccConnectionActive").attr("disabled", "disabled");
-         setTokenAndAuthenticate("/visitor/callback", "<%= @randomUid %>");
-         break;
-
-       case 'sipOk':
-         $(".rtccConnectionStatus").attr("status", "sipOk");
-         $(".rtccConnectionActive").removeAttr("disabled");
-         updateProgress("ready");
-         break;
-
-       case 'sipNok':
-         $(".rtccConnectionStatus").attr("status", "offline");
-         $(".rtccConnectionActive").attr("disabled", "disabled");
-         updateProgress("not ready");
-         break;
-
-       case 'dropped':
-         $(".rtccConnectionStatus").attr("status", "alert");
-         $(".rtccConnectionActive").attr("disabled", "disabled");
-         updateProgress("dropped");
-         break;
-
-       case 'loggedasotheruser':
-         setTokenAndAuthenticate("/visitor/callback", "<%= @randomUid %>");
-         break;
-
-       case 'presenceOkNewUser':
-         rtcc.setMyPresence(1);
-         break;
-
-       case 'presenceOkAlreadyRegistered':
-         rtcc.setMyPresence(1);
-         break;
-                            
+   // Print all events received for educational purposes
+   rtcc.onAll(function() {
+     if (window.console) {
+       console.log('Rtcc: event "' + this.eventName + '" with arguments: ' + JSON.stringify(arguments));
      }
-   }
-     
-   rtcc.onCallHandler = function(call, args) {
+   });
 
-     console.log(['onCallHandler', call, args]);
-     rtccCall = call;
+   // The Client, Cloud and Presence Event Handlers report on the status of the RTCC connection,
+   // when it is ready to make and receive calls, and when it is able to register for
+   // Presence updates.
 
-     // Handle incoming call
-     if (args.type == 'webRTCcall' && args.status == 'incoming') {
-       var ans = confirm("Accept call from '" + call.dn + "'?");
-       if (ans == true) {
-         rtccCall.accept();
-       }
-       else {
-         rtccCall.hangup();
-       }
+   rtcc.on('client.connect', function(mode) {
+     $(".rtccConnectionStatus").attr("status", "connected");
+
+     if (mode == Rtcc.connectionModes.DRIVER) {
+       $(".rtccWebRTCControls").hide();
      }
+     updateProgress("connected");
+   });
 
-     // Handle refused call
-     if (args.status == 'terminated' && args.reason == 'rejected') {
-       alert("Call rejected");
-     }
+   rtcc.on('client.disconnect', function() {
+     $(".rtccConnectionStatus").attr("status", "offline");
+     $(".rtccConnectionActive").attr("disabled", "disabled");
+     setTokenAndAuthenticate("/visitor/callback", "<%= @randomUid %>");
+   });
 
-     // Handle call to UID not logged-in
-     if (args.status == 'terminated' && args.reason == 'not found') {
-       alert("User not logged in");
-     }
+   rtcc.on('cloud.connect', function(mode) {
+     $(".rtccConnectionStatus").attr("status", "connectedCloud");
+   });
 
-     // Manage button highlighting
-     if ((args.status == "active")) {
-       // look for class rtccCallActive and mark enabled
-       $(".rtccCallActive").removeAttr("disabled");
-       updateProgress("call active");
-     }
+   rtcc.on('cloud.sip.ok', function() {
+     $(".rtccConnectionStatus").attr("status", "sipOk");
+     $(".rtccConnectionActive").removeAttr("disabled");
+     updateProgress("ready");
+   });
 
-     if ((args.status == "terminated")) {
-       // look for class rtccCallActive and mark disabled
-       $(".rtccCallActive").attr("disabled", "disabled");
-       updateProgress("call terminated");
-     }
+   rtcc.on('cloud.sip.ko', function() {
+     $(".rtccConnectionStatus").attr("status", "offline");
+     $(".rtccConnectionActive").attr("disabled", "disabled");
+     updateProgress("not ready");
+   });
 
-   }
+   rtcc.on('cloud.drop', function() {
+     $(".rtccConnectionStatus").attr("status", "alert");
+     $(".rtccConnectionActive").attr("disabled", "disabled");
+     updateProgress("dropped");
+   });
 
-   rtcc.onConfCallHandler = function(action, obj) {
+   rtcc.on('cloud.loggedotheruser', function() {
+     setTokenAndAuthenticate("/visitor/callback", "<%= @randomUid %>");
+   });
 
-     console.log(["rtccOnConfCallHandler", action, obj]);
+   rtcc.on('presence.newuser', function() {
+     rtcc.setMyPresence(1);
+   });
 
-     if (action == 'attendeeInvited') {
-       MPI = obj;       // the object is the meeting point
+   rtcc.on('presence.ok', function() {
+     rtcc.setMyPresence(1);
+   });
+
+   // The Call Event Handlers report on the status of the current call.
+   // Both one-to-one calls and multiparty calls receive these updates.
+
+   rtcc.on('call.create', defineCallListeners);
+
+
+   rtcc.on('meetingpoint.attendee.invite', function(mpa) {
+
+     MPI = mpa;       // the object is the meeting point
        
-       counterManager.stop(" Connected.");
+     counterManager.stop(" Connected.");
 
-       var ans = confirm("Accept call from '" + MPI.hostDisplayName + "'?");
-       if (ans == true) {
-         updateProgress("invitation accepted");
-         MPI.accept();
-       }
-       else {
-         updateProgress("invitation denied");
-         MPI.deny();
-       }
+     var ans = confirm("Accept call from '" + MPI.hostDisplayName + "'?");
+     if (ans == true) {
+       updateProgress("invitation accepted");
+       MPI.accept();
      }
+     else {
+       updateProgress("invitation denied");
+       MPI.deny();
+     }
+   });
 
-   }
-
-   rtcc.onGetHandler = function(name, value) {
-     console.log(['onGetHandler', name, value]);
-   }
-
-   rtcc.onMessageReceived = function(msgid, oid, msg) {
+   rtcc.on('message.receive', function(msgid, uid, msg) {
      if (originId == null) {
        counterManager.stop(" Connected.");
-       originId = oid; // set global
+       originId = uid; // set global
      }
      appendReceived(msg);
-   }
+   });
 
-   rtcc.onRtccDriverNotStarted = function(downloadUrl) {
-     var answer = confirm('Click OK to download and install the Rtcc client.');
+   // Install the SightCall Driver?
+
+   rtcc.on('driver.missing', function(downloadUrl) {
+     var answer = confirm('Click OK to download and install the RTCC Client.');
      if (answer == true) {
        window.location = downloadUrl;
      }
-   };
+   });
+
+   // Install the SightCall Plugin?
+
+   rtcc.on('plugin.missing', function(downloadUrl) {
+     var answer = confirm('Click OK to download and install the RTCC Plugin.');
+     if (answer == true) {
+       window.location = downloadUrl;
+     }
+   });
 
    rtcc.initialize();
  }
@@ -304,8 +345,8 @@
    getToken(
      "/visitor/callback",
      "<%= @randomUid %>",
-     function(data) {
-       var token = data.token;
+     function(resp) {
+       var token = resp.data;
        initializeRtcc(rtccAppId, token, "Visitor-<%= @randomUid %>");
      }, function(e) {
        // the default prints it already
