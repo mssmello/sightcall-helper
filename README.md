@@ -150,6 +150,12 @@ it to your Helper project this way.
     % heroku config:set CLOUDRECORDER_TOKEN=xxyyxxyy27331b82ef0e8fa9bfe37fcb
 ```
 
+And in the cloud-recorder console, set the Callback URL to the your
+instance of Helper.  This is how the Cloud-Recorder notifies your
+instance of Helper of its progress converting the movies.
+
+<img src="images/cloudrecorder_callback.png" width="200px" />
+
 
 ## Feature Overview
 
