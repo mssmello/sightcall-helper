@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>SightCall HelpCenter</title>
+  <title>LigaLiga Video Help</title>
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css" />
   <% if @loadrtcc %>
@@ -18,13 +18,13 @@
       <div class="navbar-header">
 
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-          <span class="sr-only">Toggle navigation</span>
+          <span class="sr-only">Alternar navegação</span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
 
-        <a class="navbar-brand" href="/"> SightCall Helper
+        <a class="navbar-brand" href="/"> LigaLiga Video Help
           <% if @loadrtcc %>
             <div class="rtccConnectionStatus" status=offline> </div> 
           <% end %>
@@ -38,18 +38,18 @@
 
             <% if controller.controller_name == 'tickets' %>
               <% if controller.action_name == 'index' %>
-                <li class="active"><a href="/tickets">Open</a></li>
-                <li class=""><a href="/tickets/closed">Closed</a></li>
+                <li class="active"><a href="/tickets">Aberto</a></li>
+                <li class=""><a href="/tickets/closed">Fechado</a></li>
               <% elsif controller.action_name == 'closed' %>
-                <li class=""><a href="/tickets">Open</a></li>
-                <li class="active"><a href="/tickets/closed">Closed</a></li>
+                <li class=""><a href="/tickets">Aberto</a></li>
+                <li class="active"><a href="/tickets/closed">Fechado</a></li>
               <% else %>
-                <li class=""><a href="/tickets">Open</a></li>
-                <li class=""><a href="/tickets/closed">Closed</a></li>                
+                <li class=""><a href="/tickets">Aberto</a></li>
+                <li class=""><a href="/tickets/closed">Fechado</a></li>                
               <% end %>
             <% else %>
-              <li class=""><a href="/tickets">Open</a></li>
-              <li class=""><a href="/tickets/closed">Closed</a></li>                
+              <li class=""><a href="/tickets">Aberto</a></li>
+              <li class=""><a href="/tickets/closed">Fechado</a></li>                
             <% end %>
 
           <% end %>
@@ -60,7 +60,7 @@
         <p class="navbar-text pull-right">
 
           <% if user_signed_in? %>
-            Logged in as <strong><%= current_user.name %></strong>.
+            Logado como <strong><%= current_user.name %></strong>.
             <%= link_to "Logout", '/auth/logout', :class => 'navbar-link'  %>
           <% else %>
             
@@ -84,7 +84,7 @@
 
   <footer>
     <div class="container">
-      SightCall 2015
+      LigaLiga.com 2016
     </div>
   </footer>
 
