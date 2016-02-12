@@ -7,11 +7,11 @@ class AuthController < ApplicationController
       user = User.authenticate(params[:name], params[:password])
 
       if user
-        flash.now[:notice] = "Successful login"
+        flash.now[:notice] = "Login Efetuado"
         session[:user_id] = user.id
         redirect_to(:controller => "tickets", :action => "index")
       else
-        flash.now[:alert] = "Invalid user/password combination"
+        flash.now[:alert] = "Combinação de usuário/senha inválida"
       end
     end
 
@@ -19,7 +19,7 @@ class AuthController < ApplicationController
 
   def logout
     session[:user_id] = nil
-    flash[:notice] = "Logged out"
+    flash[:notice] = "Desconectado"
     redirect_to(:action => "login")
   end
 
