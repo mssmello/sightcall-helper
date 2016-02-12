@@ -4,10 +4,10 @@
   <% if @ticket %>
     <h2> Take <%= @ticket.uid %> </h2>
   <% else %>
-    <h2> No Visitor </h2>
+    <h2> Sem Visitas </h2>
   <% end %>
   <div class="container well">
-    <b> Visitor Status: </b> <span id="progress-display"> 00:00 </span>
+    <b> Status do Visitante: </b> <span id="progress-display"> 00:00 </span>
   </div>
 </div>
 
@@ -32,7 +32,7 @@
 
     <!-- LAUNCH MEETING -->
     <div class="form-group">
-      <label for="host_button" class="col-sm-2">Video Call:</label>
+      <label for="host_button" class="col-sm-2">Video Chamada:</label>
 
       <div class="col-sm-6">
         <button id="host_button" disabled class="rtccHostActive btn btn-primary btn-block" disabled onclick="inviteFriend('<%= @ticket && @ticket.uid %>')">Invite Visitor</button>
@@ -80,7 +80,7 @@
 <form id="chatform" >
   <div class="input-group">
     <input id="chattext" type="text" class="form-control" placeholder="type here"/>
-    <span class="input-group-btn"> <button type="submit" class="btn btn-default"> Send </button> </span>
+    <span class="input-group-btn"> <button type="submit" class="btn btn-default"> Enviar </button> </span>
   </div>
 </form>
 
